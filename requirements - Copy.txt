@@ -1,0 +1,2 @@
+fastapi[all]
+pandas==1.5.3
