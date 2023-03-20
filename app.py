@@ -52,7 +52,11 @@ async def get_trading_info(StockCode: str, StartDate: date, EndDate: date):
 
     # Filter by StockCode and Date Range
     output_df = pd.read_sql('''
-        SELECT * FROM \"IDXTradingInfo\" WHERE \"IDXCompanyProfiles\".\"StockCode\" = \'{}\' and Date >= \'{}\' and Date <= \'{}\'
+        SELECT * FROM \"IDXTradingInfo\" 
+        WHERE
+            \"IDXCompanyProfiles\".\"StockCode\" = \'{}\' 
+            AND \"IDXCompanyProfiles\".\"Date\" >= \'{}\' 
+            AND \"IDXCompanyProfiles\".\"Date\" <= \'{}\'
     '''.format(StockCode, StartDate, EndDate), con=conn)
 
     return Response(output_df.to_json(orient="records"), media_type="application/json")
