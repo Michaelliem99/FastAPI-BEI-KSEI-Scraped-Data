@@ -52,7 +52,23 @@ async def get_trading_info(StockCode: str, StartDate: date, EndDate: date):
 
     # Filter by StockCode and Date Range
     output_df = pd.read_sql('''
-        SELECT * FROM \"IDXTradingInfo\" WHERE StockCode = \'{}\' and Date >= \'{}\' and Date <= \'{}\'
+        SELECT * FROM \"IDXTradingInfo\" WHERE \"IDXCompanyProfiles\".\"StockCode\" = \'{}\' and Date >= \'{}\' and Date <= \'{}\'
     '''.format(StockCode, StartDate, EndDate), con=conn)
+
+    return Response(output_df.to_json(orient="records"), media_type="application/json")
+
+@app.get("/financial_reports")
+async def get_financial_reports(StockCode: str, ReportPeriod: str, ReportYear: int):
+    # Your code here to retrieve the company profiles based on the parameters
+    # and format the data as a JSON response
+
+    # Filter by StockCode and Date Range
+    output_df = pd.read_sql('''
+        SELECT * FROM \"IDXTradingInfo\" 
+        WHERE 
+            \"IDXFinancialReportLinks\".\"StockCode\" = \'{}\' 
+            AND \"IDXFinancialReportLinks\".\"Report_Period\" >= \'{}\' 
+            AND \"IDXFinancialReportLinks\".\"Report_Year\" <= \'{}\'
+    '''.format(StockCode, ReportPeriod, ReportYear), con=conn)
 
     return Response(output_df.to_json(orient="records"), media_type="application/json")
