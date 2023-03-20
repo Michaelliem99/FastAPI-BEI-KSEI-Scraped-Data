@@ -81,6 +81,6 @@ async def get_financial_reports(StockCode: str, ReportYear: int, ReportPeriod: O
             WHERE 
                 \"IDXFinancialReportLinks\".\"StockCode\" = \'{}\' 
                 AND \"IDXFinancialReportLinks\".\"Report_Year\" = \'{}\'
-        '''.format(StockCode, ReportPeriod, ReportYear), con=conn)
+        '''.format(StockCode, ReportYear), con=conn)
 
     return Response(output_df.to_json(orient="records"), media_type="application/json")
