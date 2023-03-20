@@ -62,7 +62,7 @@ async def get_trading_info(StockCode: str, StartDate: date, EndDate: date):
     return Response(output_df.to_json(orient="records"), media_type="application/json")
 
 @app.get("/financial_reports")
-async def get_financial_reports(StockCode: str, ReportYear: int, ReportPeriod: Optional[str]):
+async def get_financial_reports(StockCode: str, ReportYear: int, ReportPeriod: Optional[str] = None):
     # Your code here to retrieve the company profiles based on the parameters
     # and format the data as a JSON response
 
