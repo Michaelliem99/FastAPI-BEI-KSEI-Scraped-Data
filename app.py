@@ -48,9 +48,10 @@ async def get_stock_query_options():
     # Your code here to retrieve the company profiles based on the parameters
     # and format the data as a JSON response
 
-    StockCodeDF = pd.read_sql('SELECT DISTINCT \"StockCode\" FROM \"IDXCompanyProfiles\"', con=conn)
-    SectorDF = pd.read_sql('SELECT DISTINCT \"Sektor\" FROM \"IDXCompanyProfiles\"', con=conn)
-    SubSectorDF = pd.read_sql('SELECT DISTINCT \"SubSektor\" FROM \"IDXCompanyProfiles\"', con=conn)
+    with engine.connect() as conn:
+        StockCodeDF = pd.read_sql('SELECT DISTINCT \"StockCode\" FROM \"IDXCompanyProfiles\"', con=conn)
+        SectorDF = pd.read_sql('SELECT DISTINCT \"Sektor\" FROM \"IDXCompanyProfiles\"', con=conn)
+        SubSectorDF = pd.read_sql('SELECT DISTINCT \"SubSektor\" FROM \"IDXCompanyProfiles\"', con=conn)
 
     JSONOutput = {
         'StockCodeList':StockCodeDF['StockCode'].to_list(),
@@ -68,21 +69,22 @@ async def get_company_profiles(
 ):
     # Your code here to retrieve the company profiles based on the parameters
     # and format the data as a JSON response
-    
-    if StockCode:
-        output_df = pd.read_sql('''
-            SELECT * FROM \"IDXCompanyProfiles\" WHERE \"IDXCompanyProfiles\".\"StockCode\" = \'{}\'
-        '''.format(StockCode), con=conn)
-    elif Sektor:
-        output_df = pd.read_sql('''
-            SELECT * FROM \"IDXCompanyProfiles\" WHERE \"IDXCompanyProfiles\".\"Sektor\" = \'{}\'
-        '''.format(Sektor), con=conn)
-    elif SubSektor:
-        output_df = pd.read_sql('''
-            SELECT * FROM \"IDXCompanyProfiles\" WHERE \"IDXCompanyProfiles\".\"SubSektor\" = \'{}\'
-        '''.format(SubSektor), con=conn)
-    else:
-        output_df = pd.read_sql('SELECT * FROM \"IDXCompanyProfiles\"', con=conn)
+
+    with engine.connect() as conn: 
+        if StockCode:
+            output_df = pd.read_sql('''
+                SELECT * FROM \"IDXCompanyProfiles\" WHERE \"IDXCompanyProfiles\".\"StockCode\" = \'{}\'
+            '''.format(StockCode), con=conn)
+        elif Sektor:
+            output_df = pd.read_sql('''
+                SELECT * FROM \"IDXCompanyProfiles\" WHERE \"IDXCompanyProfiles\".\"Sektor\" = \'{}\'
+            '''.format(Sektor), con=conn)
+        elif SubSektor:
+            output_df = pd.read_sql('''
+                SELECT * FROM \"IDXCompanyProfiles\" WHERE \"IDXCompanyProfiles\".\"SubSektor\" = \'{}\'
+            '''.format(SubSektor), con=conn)
+        else:
+            output_df = pd.read_sql('SELECT * FROM \"IDXCompanyProfiles\"', con=conn)
     
     return Response(output_df.to_json(orient="records"), media_type="application/json")
 
@@ -123,20 +125,21 @@ async def get_financial_reports(
     # and format the data as a JSON response
 
     # Filter by StockCode and Date Range
-    if ReportPeriod:
-        output_df = pd.read_sql('''
-            SELECT * FROM \"IDXFinancialReportLinks\" 
-            WHERE 
-                \"IDXFinancialReportLinks\".\"StockCode\" = \'{}\' 
-                AND \"IDXFinancialReportLinks\".\"Report_Period\" = \'{}\' 
-                AND \"IDXFinancialReportLinks\".\"Report_Year\" = \'{}\'
-        '''.format(StockCode, ReportPeriod, ReportYear), con=conn)
-    else:
-        output_df = pd.read_sql('''
-            SELECT * FROM \"IDXFinancialReportLinks\" 
-            WHERE 
-                \"IDXFinancialReportLinks\".\"StockCode\" = \'{}\' 
-                AND \"IDXFinancialReportLinks\".\"Report_Year\" = \'{}\'
-        '''.format(StockCode, ReportYear), con=conn)
+    with engine.connect() as conn:
+        if ReportPeriod:
+            output_df = pd.read_sql('''
+                SELECT * FROM \"IDXFinancialReportLinks\" 
+                WHERE 
+                    \"IDXFinancialReportLinks\".\"StockCode\" = \'{}\' 
+                    AND \"IDXFinancialReportLinks\".\"Report_Period\" = \'{}\' 
+                    AND \"IDXFinancialReportLinks\".\"Report_Year\" = \'{}\'
+            '''.format(StockCode, ReportPeriod, ReportYear), con=conn)
+        else:
+            output_df = pd.read_sql('''
+                SELECT * FROM \"IDXFinancialReportLinks\" 
+                WHERE 
+                    \"IDXFinancialReportLinks\".\"StockCode\" = \'{}\' 
+                    AND \"IDXFinancialReportLinks\".\"Report_Year\" = \'{}\'
+            '''.format(StockCode, ReportYear), con=conn)
 
     return Response(output_df.to_json(orient="records"), media_type="application/json")
